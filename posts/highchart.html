@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html prefix="
+og: http://ogp.me/ns#
+article: http://ogp.me/ns/article#
+" lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="description" content="highchart">
+    <meta name="viewport" content="width=device-width">
+    <title>highchart | Diving into IPython notebook</title>
+
+                <link href="../assets/css/all-nocdn.css" rel="stylesheet" type="text/css">
+
+                <link rel="alternate" type="application/rss+xml" title="RSS" href="../rss.xml">
+
+      <link rel="canonical" href="posts/highchart.html">
+
+
+
+    
+        <!--[if lt IE 9]><script src="/assets/js/html5.js"></script><![endif]-->
+
+    
+
+    
+    <meta name="author" content="dongweiming">
+        <meta property="og:site_name" content="Diving into IPython notebook">
+    <meta property="og:title" content="highchart">
+    <meta property="og:url" content="posts/highchart.html">
+    <meta property="og:description" content="highchart">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2015-01-05T15:36:17+08:00">
+           <meta property="article:tag" content="ipython">
+           <meta property="article:tag" content="notebook">
+
+    
+    
+
+</head>
+<body>
+    <section class="social">
+        <ul>
+                    <li><a href="../about/" title="About"><i class="icon-coffee"></i></a></li>
+            <li><a href="../archive/" title="Archive"><i class="icon-book"></i></a></li>
+            <li><a href="mailto:ciici123@gmail.com" title="Email"><i class="icon-envelope"></i></a></li>
+            <li><a href="http://twitter.com/dongweiming" title="Twitter"><i class="icon-twitter"></i></a></li>
+            <li><a href="http://github.com/dongweiming" title="Github"><i class="icon-github-alt"></i></a></li>
+            <li><a href="../rss.xml" title="Rss"><i class="icon-rss"></i></a></li>
+
+        </ul>
+    </section>
+    <section class="page-content">
+        <div class="content" rel="main">
+    <div class="post">
+        <h1 class="p-name entry-title" itemprop="headline name">highchart</h1>
+
+        <div class="meta">
+            <div class="authordate">
+                <time class="timeago" datetime="2015-01-05T15:36:17+08:00">2015-01-05 15:36</time>
+            
+                      |  
+        <a href="highchart.ipynb" id="sourcelink">Source</a>
+
+            </div>
+                    <div itemprop="keywords" class="tags">
+        <ul>
+        Tags : 
+           <li><a class="tag p-category" href="../categories/ipython.html" rel="tag">ipython</a></li>
+           <li><a class="tag p-category" href="../categories/notebook.html" rel="tag">notebook</a></li>
+        </ul>
+        </div>
+
+        </div>
+        <div class="body">
+            <div tabindex="-1" id="notebook" class="border-box-sizing">
+    <div class="container" id="notebook-container">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In [4]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">'data/commit_activity.json'</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="n">series</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+    <span class="n">month</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">'week'</span><span class="p">])</span><span class="o">.</span><span class="n">month</span>
+    <span class="n">series</span><span class="p">[</span><span class="n">month</span><span class="p">]</span> <span class="o">+=</span> <span class="n">d</span><span class="p">[</span><span class="s">'total'</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In [5]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="n">HTML</span><span class="p">(</span><span class="s">'''</span>
+<span class="s">&lt;script src="http://code.highcharts.com/highcharts.js"&gt;&lt;/script&gt;</span>
+<span class="s">&lt;script src="http://code.highcharts.com/modules/exporting.js"&gt;&lt;/script&gt;</span>
+
+<span class="s">&lt;div id="chart" style="min-width: 400px; height: 400px; margin: 0 auto"&gt;&lt;/div&gt;</span>
+<span class="s">&lt;script&gt;</span>
+<span class="s">    do_chart = function() {</span>
+
+<span class="s">        $('#chart').highcharts({</span>
+<span class="s">            chart: {</span>
+<span class="s">                type: 'line',</span>
+<span class="s">                marginRight: 130,</span>
+<span class="s">                marginBottom: 25</span>
+<span class="s">            },</span>
+<span class="s">            title: {</span>
+<span class="s">                text: 'Last Year of commit activity',</span>
+<span class="s">                x: -20</span>
+<span class="s">            },</span>
+<span class="s">            subtitle: {</span>
+<span class="s">                text: 'https://github.com/mitsuhiko/flask',</span>
+<span class="s">                x: -20</span>
+<span class="s">            },</span>
+<span class="s">            xAxis: {</span>
+<span class="s">                categories: Highcharts.getOptions().lang.shortMonths</span>
+<span class="s">            },</span>
+<span class="s">            yAxis: {</span>
+<span class="s">                title: {</span>
+<span class="s">                    text: 'commits'</span>
+<span class="s">                },</span>
+<span class="s">                plotLines: [{</span>
+<span class="s">                    value: 0,</span>
+<span class="s">                    width: 1,</span>
+<span class="s">                    color: '#808080'</span>
+<span class="s">                }]</span>
+<span class="s">            },</span>
+<span class="s">            tooltip: {</span>
+<span class="s">                valueSuffix: 'number'</span>
+<span class="s">            },</span>
+<span class="s">            legend: {</span>
+<span class="s">                layout: 'vertical',</span>
+<span class="s">                align: 'right',</span>
+<span class="s">                verticalAlign: 'top',</span>
+<span class="s">                x: -10,</span>
+<span class="s">                y: 100,</span>
+<span class="s">                borderWidth: 0</span>
+<span class="s">            },</span>
+<span class="s">            series: </span><span class="si">%s</span><span class="s"></span>
+<span class="s">        });</span>
+
+<span class="s">    }</span>
+<span class="s">    setTimeout("do_chart()", 50)</span>
+<span class="s">&lt;/script&gt;</span>
+<span class="s">'''</span> <span class="o">%</span> <span class="p">[{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'flask'</span><span class="p">,</span> <span class="s">'data'</span><span class="p">:</span> <span class="n">series</span><span class="o">.</span><span class="n">values</span><span class="p">()}])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt output_prompt">
+    Out[5]:</div>
+
+<div class="output_html rendered_html output_subarea output_pyout">
+
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+<div id="chart" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+<script>
+    do_chart = function() {
+
+        $('#chart').highcharts({
+            chart: {
+                type: 'line',
+                marginRight: 130,
+                marginBottom: 25
+            },
+            title: {
+                text: 'Last Year of commit activity',
+                x: -20
+            },
+            subtitle: {
+                text: 'https://github.com/mitsuhiko/flask',
+                x: -20
+            },
+            xAxis: {
+                categories: Highcharts.getOptions().lang.shortMonths
+            },
+            yAxis: {
+                title: {
+                    text: 'commits'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: 'number'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'top',
+                x: -10,
+                y: 100,
+                borderWidth: 0
+            },
+            series: [{'data': [12, 29, 19, 40, 20, 10, 17, 67, 16, 23, 27, 7], 'name': 'flask'}]
+        });
+
+    }
+    setTimeout("do_chart()", 50)
+</script>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In [1]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">import</span> <span class="nn">jinja2</span>
+<span class="kn">from</span> <span class="nn">IPython.html.widgets</span> <span class="kn">import</span> <span class="n">interact</span>
+<span class="kn">from</span> <span class="nn">IPython.html</span> <span class="kn">import</span> <span class="n">widgets</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">display_pretty</span><span class="p">,</span> <span class="n">Javascript</span><span class="p">,</span> <span class="n">HTML</span>
+<span class="kn">from</span> <span class="nn">IPython.utils.traitlets</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Bool</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Unicode</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In [2]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="o">%%</span><span class="nx">javascript</span>
+<span class="nx">require</span><span class="p">.</span><span class="nx">config</span><span class="p">({</span>
+    <span class="nx">paths</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">chartjs</span><span class="o">:</span> <span class="s1">'//code.highcharts.com/highcharts'</span><span class="p">,</span>
+        <span class="nx">highcharts</span><span class="o">:</span> <span class="s1">'//code.highcharts.com/modules/exporting'</span><span class="p">,</span>
+        <span class="nx">sandsignika</span><span class="o">:</span> <span class="s1">'//www.highcharts.com/js/themes/sand-signika'</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="nx">shim</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">highcharts</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s1">'deps'</span><span class="o">:</span> <span class="p">[</span><span class="s1">'chartjs'</span><span class="p">,</span> <span class="s1">'sandsignika'</span><span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_javascript ">
+<script type="text/javascript">
+require.config({
+    paths: {
+        chartjs: '//code.highcharts.com/highcharts',
+        highcharts: '//code.highcharts.com/modules/exporting',
+        sandsignika: '//www.highcharts.com/js/themes/sand-signika',
+    },
+    shim: {
+        highcharts: {
+            'deps': ['chartjs', 'sandsignika']
+        }
+    }
+});
+</script>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In [3]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">display_chart_highcharts</span><span class="p">(</span><span class="n">show_javascript</span><span class="p">,</span> <span class="n">show</span><span class="p">,</span> <span class="n">div</span><span class="p">):</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="s">"""</span>
+<span class="s">    require(["highcharts"], function() {</span>
+<span class="s">        $('#chart_highcharts').highcharts({</span>
+<span class="s">            chart: {</span>
+<span class="s">                type: '{{ chart_type }}'</span>
+<span class="s">            },</span>
+<span class="s">            title: {</span>
+<span class="s">                text: '{{ title }}',</span>
+<span class="s">                x: -20 //center</span>
+<span class="s">            },</span>
+<span class="s">            subtitle: {</span>
+<span class="s">                text: 'https://github.com/mitsuhiko/flask',</span>
+<span class="s">                x: -20</span>
+<span class="s">            },</span>
+<span class="s">            xAxis: {</span>
+<span class="s">                categories: Highcharts.getOptions().lang.shortMonths</span>
+<span class="s">            },</span>
+<span class="s">            yAxis: {</span>
+<span class="s">                title: {</span>
+<span class="s">                    text: '{{ yaxis }}'</span>
+<span class="s">                }</span>
+<span class="s">            },</span>
+<span class="s">            plotOptions: {{ plot }},</span>
+<span class="s">            series: {{ series }}</span>
+<span class="s">        });</span>
+<span class="s">    });</span>
+<span class="s">    """</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">'data/{}.json'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">show</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'by_'</span><span class="p">,</span> <span class="s">''</span><span class="p">)))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    <span class="n">chart_type</span> <span class="o">=</span> <span class="s">'line'</span>
+    <span class="n">plot</span> <span class="o">=</span> <span class="s">'{}'</span>
+    <span class="k">if</span> <span class="n">show</span> <span class="o">==</span> <span class="s">'by_code_frequency'</span><span class="p">:</span>
+        <span class="n">pos_series</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">nag_series</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">week</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">nag</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">month</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">week</span><span class="p">)</span><span class="o">.</span><span class="n">month</span>
+            <span class="n">pos_series</span><span class="p">[</span><span class="n">month</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pos</span>
+            <span class="n">nag_series</span><span class="p">[</span><span class="n">month</span><span class="p">]</span> <span class="o">+=</span> <span class="o">-</span><span class="n">nag</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="p">[{</span>
+                <span class="s">'name'</span><span class="p">:</span> <span class="s">'additions'</span><span class="p">,</span>
+                <span class="s">'data'</span><span class="p">:</span> <span class="n">pos_series</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">},</span> <span class="p">{</span>
+                <span class="s">'name'</span><span class="p">:</span> <span class="s">'deletions '</span><span class="p">,</span>
+                <span class="s">'data'</span><span class="p">:</span> <span class="n">nag_series</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">}]</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s">'Get the number of additions and deletions per week'</span>
+        <span class="n">yaxis</span> <span class="o">=</span> <span class="s">'aggregate of the number'</span>
+        <span class="n">chart_type</span> <span class="o">=</span> <span class="s">'column'</span>
+        <span class="n">plot</span> <span class="o">=</span> <span class="s">"""{</span>
+<span class="s">                column: {</span>
+<span class="s">                    pointPadding: 0.2,</span>
+<span class="s">                    borderWidth: 0</span>
+<span class="s">                }</span>
+<span class="s">            }"""</span>
+    <span class="k">elif</span> <span class="n">show</span> <span class="o">==</span> <span class="s">'by_contributors'</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s">'total'</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="s">'author'</span><span class="p">][</span><span class="s">'login'</span><span class="p">]</span>
+            <span class="n">_series</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">i</span><span class="p">[</span><span class="s">'weeks'</span><span class="p">]:</span>
+                <span class="n">month</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">'w'</span><span class="p">])</span><span class="o">.</span><span class="n">month</span>
+                <span class="n">_series</span><span class="p">[</span><span class="n">month</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">'a'</span><span class="p">]</span> <span class="o">+</span> <span class="n">d</span><span class="p">[</span><span class="s">'c'</span><span class="p">]</span> <span class="o">+</span> <span class="n">d</span><span class="p">[</span><span class="s">'d'</span><span class="p">])</span>
+            <span class="n">series</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s">'name'</span><span class="p">:</span> <span class="n">name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">),</span>
+                <span class="s">'data'</span><span class="p">:</span> <span class="n">_series</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">})</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s">'Get contributors list with additions, deletions, and commit counts'</span>
+        <span class="n">yaxis</span> <span class="o">=</span> <span class="s">'commit number'</span>
+            
+    <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="n">template</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">yaxis</span><span class="o">=</span><span class="n">yaxis</span><span class="p">,</span> <span class="n">series</span><span class="o">=</span><span class="n">series</span><span class="p">,</span>
+        <span class="n">chart_type</span><span class="o">=</span><span class="n">chart_type</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="n">plot</span>
+    <span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">show_javascript</span><span class="p">:</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">PopupWidget</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">HTMLWidget</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="s">'&lt;div style="width:600px; height: 400px; overflow:scroll;"&gt;&lt;pre&gt;{}&lt;/pre&gt;&lt;/div&gt;'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rendered_template</span><span class="p">)),)))</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">Javascript</span><span class="p">(</span><span class="n">rendered_template</span><span class="p">))</span>
+
+<span class="n">i</span> <span class="o">=</span> <span class="n">interact</span><span class="p">(</span>
+    <span class="n">display_chart_highcharts</span><span class="p">,</span>
+    <span class="n">show_javascript</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">CheckboxWidget</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+    <span class="n">show</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">DropdownWidget</span><span class="p">(</span>
+        <span class="n">values</span><span class="o">=</span><span class="p">{</span><span class="s">'Code frequency'</span><span class="p">:</span><span class="s">'by_code_frequency'</span><span class="p">,</span> <span class="s">'Contributors'</span><span class="p">:</span> <span class="s">'by_contributors'</span><span class="p">},</span>
+        <span class="n">value</span><span class="o">=</span><span class="s">'by_contributors'</span>
+    <span class="p">),</span>
+    <span class="n">div</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">HTMLWidget</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s">'&lt;div id="chart_highcharts"&gt;&lt;/div&gt;'</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_javascript ">
+<script type="text/javascript">
+
+    require(["highcharts"], function() {
+        $('#chart_highcharts').highcharts({
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: 'Get contributors list with additions, deletions, and commit counts',
+                x: -20 //center
+            },
+            subtitle: {
+                text: 'https://github.com/mitsuhiko/flask',
+                x: -20
+            },
+            xAxis: {
+                categories: Highcharts.getOptions().lang.shortMonths
+            },
+            yAxis: {
+                title: {
+                    text: 'commit number'
+                }
+            },
+            plotOptions: {},
+            series: [{'data': [369, 276, 598, 15018, 8358, 5181, 6312, 10574, 1718, 1548, 188, 229], 'name': 'mitsuhiko'}, {'data': [957, 15, 134, 1022, 60, 740, 32, 24, 5, 103, 0, 0], 'name': 'rduplain'}, {'data': [0, 0, 25, 0, 258, 0, 18, 30089, 32, 13, 6, 8], 'name': 'untitaker'}, {'data': [0, 12, 9, 78, 700, 38, 63, 29, 5, 44, 0, 91], 'name': 'DasIch'}, {'data': [0, 0, 0, 0, 0, 0, 0, 0, 35, 83, 866, 0], 'name': 'defuz'}]
+        });
+    });
+    
+</script>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    </div>
+  </div>
+
+        </div>
+                <ul class="pager">
+            <li class="next">
+                <a href="nbconvert.html" rel="next" title="nbconvert">Next post</a>
+            </li>
+        </ul>
+
+    </div>
+                    <footer id="footer" role="contentinfo">
+            <p>Contents © 2015         <a href="mailto:ciici123@gmail.com">dongweiming</a> - Powered by         <a href="http://getnikola.com" rel="nofollow">Nikola</a>         </p>
+            
+        </footer>
+
+        </div>
+    </section>
+    
+    
+                <script src="../assets/js/all-nocdn.js" type="text/javascript"></script>
+    
+<!-- Social buttons -->
+<div id="addthisbox" class="addthis_toolbox addthis_peekaboo_style addthis_default_style addthis_label_style addthis_32x32_style">
+<a class="addthis_button_more">Share</a>
+<ul>
+<li>
+<a class="addthis_button_facebook"></a>
+</li>
+<li>
+<a class="addthis_button_google_plusone_share"></a>
+</li>
+<li>
+<a class="addthis_button_linkedin"></a>
+</li>
+<li>
+<a class="addthis_button_twitter"></a>
+</li>
+</ul>
+</div>
+<script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4f7088a56bb93798"></script>
+<!-- End of social buttons -->
+
+
+        <script type="text/javascript">
+            $(function(){
+                $('.timeago').timeago();
+            });
+        </script>
+</body>
+</html>
